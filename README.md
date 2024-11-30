@@ -15,5 +15,5 @@
 
 ### 3️⃣ Docker 化你的應用  
 - **工具**：Docker  
-  - 使用 Docker 技術將 API 製作成 image 和 container。  
+  - 使用 Docker 技術將程式、環境、 API 製作成 image 和 container。  
   - 確保應用可以在任何伺服器上部署，無需擔心環境配置和依賴問題！  

@@ -3,8 +3,9 @@
 ## 實作項目：
 
 ### 1️⃣ 模型訓練與自動化  
-- **工具**：Google Colab   
-  - 在 Google Colab 平台上進行模型訓練。  
+- **工具**：Google Colab
+- **方法**：RandomForest   
+  - 在 Google Colab 平台上進行模型訓練。
 
 ### 2️⃣ 建立 API 接口  
 - **框架**：FastAPI  

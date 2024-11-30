@@ -1,32 +1,36 @@
 import pickle
 import shutil
 import pandas as pd
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 
-app = FastAPI() # uvicorn main:app --reload
+app = FastAPI()
 
-model = pickle.load(open('./models/text_classifier.pkl', 'rb'))
-tfidf_vectorizer = pickle.load(open('./models/text_vectorizer.pkl', 'rb'))
-label_encoder = pickle.load(open('./models/text_encoder.pkl', 'rb'))
+model = pickle.load(open('text_classifier.pkl', 'rb'))
+tfidf_vectorizer = pickle.load(open('text_vectorizer.pkl', 'rb'))
+label_encoder = pickle.load(open('text_encoder.pkl', 'rb'))
 
 @app.post('/upload')
 async def uploadFile(file: UploadFile = File(...)):
-    # 把大文件分成一個一個小包，then保存
-    with open('test.csv', 'wb') as buffer:
+    with open( 'test.csv', 'wb' ) as buffer:
         shutil.copyfileobj(file.file, buffer)
     return {'file_name': file.filename}
 
 @app.get('/')
 def processor():
-    input_df = pd.read_csv('./data/test.csv')
-    # 文本特徵提取，衡量每個單詞對文章的重要性
+
+    input_df = pd.read_csv('test.csv')
+
     features = tfidf_vectorizer.transform(input_df['body'])
-    preds =  model.predict(features)
-    # 預測的值是訓練的結果(數值)，需要再轉換成對應的分類，使用label_encoder
-    input_df['category'] = label_encoder.inverse_transform(preds)
 
-    output_df = input_df[['id', 'category']]
-    output_df.to_csv('result.csv', index=False)
+    predictions = model.predict(features)
 
-    return FileResponse('result.csv')
+    input_df['category'] = label_encoder.inverse_transform(predictions)
+
+    outPut_df = input_df[['id', 'category']]
+    outPut_df.to_csv('result.csv', index=False)
+
+    try:
+        return FileResponse('result.csv')
+    except:
+        raise HTTPException(status_code=404, detail="CSV file not uploaded.")
